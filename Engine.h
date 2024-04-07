@@ -9,9 +9,9 @@ class Engine
 {
 	GLFWwindow* window;
 	ShaderProc proc;
-	Logic logic;
-
 public:
+
+	Logic logic;
 	bool Init();
 	void Start();
 };

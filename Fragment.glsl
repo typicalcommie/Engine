@@ -9,6 +9,5 @@ uniform sampler2D second;
 void main()
 {
 	color = mix(texture(second, inp), texture(first, inp), 0.5f);
-	color.a = 0.1f;
 
 }

@@ -107,25 +107,22 @@ void Engine::Start()
 	vao.Bind();
 
 	vec4 pos = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	vec3 offset = vec3(0.0f, 0.0f, 5.0f);
-	mat4 trans = mat4(1.0f);
-	trans = translate(trans, offset);
-
-	pos = trans * pos;
-
+	mat4 trans{1};
 	mat4 scl = scale(mat4(1), vec3(0.1, 0.1, 0.1));
 
 	Logic logic;
-	logic.Initialization(window);
+	logic.Initialization(1);
+	logic.input.Init(window);
 
 	while (!glfwWindowShouldClose(window))
 	{
-
-		scl *= trans;
-		trans = rotate(mat4(1), radians(1.f), vec3(1, 1, 0));
-		
+		trans = mat4(1);
+		trans *= scl;
+		//trans = rotate(trans, radians(1.f), vec3(1, 1, 0));
+		trans = translate(trans, logic.input.InputProc());
+		//
 		proc.SetUniformFloat("size", size);
-		proc.SetUniformMatrix("transform", scl);
+		proc.SetUniformMatrix("transform", trans);
 		glClear(GL_COLOR_BUFFER_BIT); //Specifices what buffer will be cleared. GL_COLOR_BUFFER_BIT - to clear only color. There is also values for stencil and deep buffer, that can be cleared in one time if you set it with bitwise operator.
 		glClearColor(0.0f, 0.3f, 0.2f, 0.0f);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
