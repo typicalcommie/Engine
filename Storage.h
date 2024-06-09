@@ -8,7 +8,6 @@ typedef unsigned int uint;
 
 template <typename T> class Storage
 {
-
 	T** data{};
 	T** temp{};
 
@@ -17,7 +16,6 @@ template <typename T> class Storage
 
 	uint iteratorOld = 0;
 	uint iterator = 0;
-
 
 	void Temp()
 	{
@@ -51,10 +49,12 @@ template <typename T> class Storage
 	}
 
 public:
+
 	void Resize(uint capacity)
 	{
 		if (data)
 		{
+
 			Temp();
 			_deleteArray(data);
 			data = new T * [capacity] {};
@@ -80,6 +80,7 @@ public:
 	{
 		uint id;
 		data[id = FindSpace()] = value;
+		size++;
 		return id;
 	}
 

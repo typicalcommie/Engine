@@ -1,8 +1,5 @@
 #include "Engine.h"
 
-
-
-
 void SizeChange(GLFWwindow* window, int x, int y)
 {
 	glViewport(0, 0, x, y);
@@ -23,6 +20,7 @@ bool Engine::Init()
 		return false;
 	}
 	glfwMakeContextCurrent(window);
+	graphics.SetWindow(window);
 
 	if (!gladLoadGLLoader(GLADloadproc(glfwGetProcAddress)))
 	{
@@ -39,95 +37,87 @@ bool Engine::Init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
+	graphics.Initialization();
 	
 	Shader vertex, fragment;
-
-
 	vertex.Create(VERTEX, (char*)"Vertex.glsl");
 	fragment.Create(FRAGMENT, (char*)"Fragment.glsl");
-	proc.Create();
-	proc.Attach(vertex);
-	proc.Attach(fragment);
-	proc.Link();
+	
 
+	ShaderProc* proc = graphics.GetProc();
+	proc->Create();
+	proc->Attach(vertex);
+	proc->Attach(fragment);
+	proc->Link();
+
+	glfwSwapInterval(1);
+	glEnable(GL_DEPTH_TEST);
 	return true;
 }
 
 
 void Engine::Start()
 {
-	VertexObjectArray vao;
-	vao.Create();
-	vao.Bind();
+	graphics.GetProc()->Use();
 
-	VertexObject triangle;
+	Texture texture;
+	texture.Create((char*)"Data/Pics/desu~.jpg", 1);
+	texture.Bind();
+	
+	Logic logic;
+	logic.Initialization(window, 1);
+	logic.input.Init(window);
 
 	float vertices[] =
 	{
-		-1.0f, -1.0f, 0.0f,  0.0f, 1.0f,
-		-1.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,  1.0f, 1.0f
+		-1.0f, -1.0f, 0.0f,  0.0f, 1.0f,	//front, left low
+		-1.0f, 1.0f, 0.0f,   0.0f, 0.0f,	// front, left high
+		1.0f, 1.0f, 0.0f,   1.0f, 0.0f,		// front, right high
+
+		-1.0f, -1.0f, 0.0f,  0.0f, 1.0f,	//front, left low
+		1.0f, 1.0f, 0.0f,   1.0f, 0.0f,		//front, right high
+		1.0f, -1.0f, 0.0f,  1.0f, 1.0f,		//front, right low
+
+		1.0f, 1.0f, 2.0f, 0.0f, 0.0f,
+		1.0f, 1.0f, 0.0f,  1.0f, 0.0f,
+		1.0f, -1.0f, 0.0f,  1.0f, 1.0f,	//right side
+
+		1.0f, -1.0f, 2.0f, 0.0f, 1.0f,
+		1.0f, 1.0f, 2.0f,  0.0f, 0.0f,
+		1.0f, -1.0f, 0.0f,  1.0f, 1.0f,
+
+		-1.0f, 1.0f, 2.0f, 1.0f, 0.0f,
+		-1.0f, 1.0f, 0.0f,  0.0f, 0.0f,
+		-1.0f, -1.0f, 0.0f,  0.0f, 1.0f,	//left side
+
+		-1.0f, -1.0f, 2.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, 2.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f, 0.0f,  0.0f, 1.0f
 	};
 
-	triangle.Create(vertices, 4, 5);
+	Model square;
+	square.Create(1, vertices, 5, 18);
+	uint model = graphics.SetModel(&square);
+	uint textr = graphics.SetTexture(&texture);
 
-	Index index;
-	index.Create();
-	uint indices[] =
-	{
-		0, 1, 2,
-		0, 2, 3
-	};
-	index.Set(indices, 24);
+	uint scene = logic.CreateScene(true, 1);
 
-	index.Bind();
-	triangle.Bind();
-	Layout vert, tex;
+	Camera::params *par = logic.GetScene(scene)->GetCamera();
 
-	vert.Create(0, 3, 5, 0);
-	vert.Enable();
-	tex.Create(1, 2, 5, 3);
-	tex.Enable();
+	logic.GetScene(scene)->Initialization(6);
+	logic.GetScene(scene)->CreateObject(true, model, textr, vec3(2.0f, 2.0f, 2.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.3f, 0.3f, 0.3f));
+	logic.GetScene(scene)->CreateObject(true, model, textr, vec3(-1.0f, -1.0f, 2.0f), vec3(0), vec3(0.5f, 0.5f, 0.5f));
+	logic.GetScene(scene)->CreateObject(true, model, textr, vec3(-10.0f, 2.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.3f, 0.3f, 0.3f));
+	logic.GetScene(scene)->CreateObject(true, model, textr, vec3(10.0f, -1.0f, -5.0f), vec3(0), vec3(0.5f, 0.5f, 0.5f));
+	logic.GetScene(scene)->CreateObject(true, model, textr, vec3(-5.0f, 2.0f, -20.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.3f, 0.3f, 0.3f));
+	logic.GetScene(scene)->CreateObject(true, model, textr, vec3(5.0f, -1.0f, -20.0f), vec3(0), vec3(0.5f, 0.5f, 0.5f));
 
-	Texture texture, texture1;
-	int i = 0, a = 1;
-
-	texture.Create((char*)"Data/Pics/desu~.jpg", 1);
-	texture1.Create((char*)"Data/Pics/st.jpg", 0);
-
-	texture.Bind();
-	texture1.Bind();
-	proc.Use();
-	proc.SetUniformInteger("first", 0);
-	proc.SetUniformInteger("second", 1);
-
-	float size = 0.3f;
-	glfwSwapInterval(1);
-	vao.Bind();
-
-	vec4 pos = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	mat4 trans{1};
-	mat4 scl = scale(mat4(1), vec3(0.1, 0.1, 0.1));
-
-	Logic logic;
-	logic.Initialization(1);
-	logic.input.Init(window);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	while (!glfwWindowShouldClose(window))
 	{
-		trans = mat4(1);
-		trans *= scl;
-		//trans = rotate(trans, radians(1.f), vec3(1, 1, 0));
-		trans = translate(trans, logic.input.InputProc());
-		//
-		proc.SetUniformFloat("size", size);
-		proc.SetUniformMatrix("transform", trans);
-		glClear(GL_COLOR_BUFFER_BIT); //Specifices what buffer will be cleared. GL_COLOR_BUFFER_BIT - to clear only color. There is also values for stencil and deep buffer, that can be cleared in one time if you set it with bitwise operator.
-		glClearColor(0.0f, 0.3f, 0.2f, 0.0f);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		logic.Execute();
+		graphics.Draw(logic.GetStorage());
 	}
 
 	glfwTerminate();

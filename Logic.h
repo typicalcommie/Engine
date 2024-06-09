@@ -2,6 +2,7 @@
 #include "Storage.h"
 #include "Shader.h"
 #include "Input.h"
+#include "Camera.h"
 using namespace glm;
 
 typedef unsigned int uint;
@@ -15,16 +16,19 @@ public:
 	uint texture_id;
 
 	bool draw = false;
-	vec3 position{};
-	mat4 rotation{1};
-	mat4 scale{1};
+	vec3 positionV{};
+	vec3 rotationV{};
+	vec3 scaleV{};
 
-	void Create(uint id, uint modelid, uint textureid) { id = id; model_id = modelid; texture_id = textureid; };
+	float r = 0.0f;
 
-	void SetPosition(vec3 pos) { position = pos; }
-	void AddPosition(vec3 pos) { position += pos; }
-	void DrawState(bool state) { draw = state; };
-	mat4 GetMatrix() { return rotation * scale * translate(mat4(), position); };
+	mat4 GetMatrix() { 
+		mat4 matrix(1);
+		matrix = rotate(matrix, radians(r), vec3(1.f, 0.0f, 0.0f));	//Rotate will broke the matrix if none of rotation directions will be defined
+		matrix = scale(matrix, scaleV);
+		matrix = translate(matrix, positionV); 
+		return matrix;
+	};
 };
 
 class Scene
@@ -33,29 +37,80 @@ public:
 	uint id{};
 	bool process = false;
 	Storage<Object> objects{};
-	
-	uint CreateObject()
+	Camera::params cameraParams;
+
+	void Initialization(uint number_of_objects)
 	{
-		Object object;
-		return objects.Set(object);
+		objects.Resize(number_of_objects);
+	}
+
+	uint CreateObject(bool draw, uint model_id, uint texture_id, vec3 init_position = {}, vec3 rotation = {}, vec3 scale = {1.0f, 1.0f, 1.0f})
+	{
+		Object* object = new Object;
+
+		object->id = objects.Set(object);
+		object->draw = draw;
+		object->model_id = model_id;
+		object->texture_id = texture_id;
+		object->positionV = init_position;
+		object->rotationV = rotation;
+		object->scaleV = scale;
+
+		return object->id;
+	}
+
+	Object* GetObject(uint id)
+	{
+		return objects.Get(id);
+	}
+
+	Camera::params* GetCamera()
+	{
+		return &cameraParams;
 	}
 
 };
 
-class Logic
+class User
 {
 public:
+	Input* input;
+	vec3 position{};
+	vec3 rotation{};
+	vec3 rotationClamp{};
+
+	Camera::params camera;
+
+	float speed = 0.005f;
+	uint currentScene = 0;
+
+	void Move();
+
+	void SetRotation(vec3 rotation);
+};
+
+class Logic
+{
 	Storage<Scene> scenes;
+	User user;
+public:
+	GLFWwindow* window;
 	Input input;
 
-	void Initialization(uint number_of_scenes)
+	void Initialization(GLFWwindow* window, uint scenes_capacity)
 	{
-		scenes.Resize(number_of_scenes);
-		for (uint i = 0; i < number_of_scenes; i++)
-		{
-			Scene scene;
-			scene.id = i;
-			scenes.Set(scene);
-		}
+		user.input = &input;
+		input.Init(window);
+		this->window = window;
+		scenes.Resize(scenes_capacity);
 	}
+	uint CreateScene(bool process, uint start_capacity);
+	Scene* GetScene(uint id)
+	{
+		return scenes.Get(id);
+	}
+
+	void Execute();
+
+	Storage<Scene> GetStorage() { return scenes; }
 };

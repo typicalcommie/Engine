@@ -1,13 +1,12 @@
 #version 460 core
 
-in vec2 inp;
+in vec2 textureCoordsFrag;
 out vec4 color;
 
 uniform sampler2D first;
-uniform sampler2D second;
 
 void main()
 {
-	color = mix(texture(second, inp), texture(first, inp), 0.5f);
-
+	color = texture(first, textureCoordsFrag);
+//	color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }

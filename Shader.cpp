@@ -1,14 +1,5 @@
 #include "Shader.h"
 
-void VertexObject::Create(float* data, uint size, uint complexity)
-{
-	this->complexity = complexity;
-	glGenBuffers(1, &id);
-	glBindBuffer(GL_ARRAY_BUFFER, id);
-	glBufferData(GL_ARRAY_BUFFER, (size * complexity) * 4, data, GL_STATIC_DRAW);
-	allocated = true;
-}
-
 bool Shader::Compiled()
 {
 	int compiled;

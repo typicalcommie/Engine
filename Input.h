@@ -4,35 +4,17 @@
 
 class Input
 {
+	vec2 mouse{};
+	float scroll{};
+	vec3 data{};
 public:
 	GLFWwindow* window;
-	void Init(GLFWwindow* window) { this->window = window; }
+	void Init(GLFWwindow* window);
 
-	vec3 pos;
-
-	vec3 InputProc()
-	{
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		{
-			pos.y += 0.05f;
-		}
-
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		{
-			pos.y += -0.05f;
-		}
-
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		{
-			pos.x += -0.05f;
-		}
-
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		{
-			pos.x += 0.05f;
-		}
-		return pos;
-	}
-
-
+	inline bool Key(char key) { glfwGetKey(window, key); }
+	vec2 GetMouse();
+	float GetScroll();
+	vec3 GetData();
+	bool GetKey(uint key);
+	void Execute();
 };

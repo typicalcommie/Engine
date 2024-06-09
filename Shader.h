@@ -12,37 +12,9 @@
 using namespace glm;
 typedef unsigned int uint;
 
-class Layout
-{
-	uint id;
-public:
-	//stride - is count of values in a row.
-	void Create(uint id, uint size, uint stride, uint offset) { this->id = id; glVertexAttribPointer(id, size, GL_FLOAT, false, stride * 4, (void*)(offset * 4)); }
-	void Enable() { glEnableVertexAttribArray(id); }
-	void Disable() { glDisableVertexAttribArray(id); }
-	uint GetId() { return id; }
-	
-};
-
-class VertexObjectArray
-{
-	uint id{};
-
-public:
-
-	VertexObjectArray() { glGenVertexArrays(1, &id); }
-
-	void inline Create() { if(!id) glGenVertexArrays(1, &id); }
-
-	void inline Bind() { glBindVertexArray(id); }
-
-	void inline Delete() { glDeleteVertexArrays(1, &id); }
-
-};
-
 class Index
 {
-	uint id;
+	uint id{};
 
 public:
 
@@ -51,44 +23,6 @@ public:
 	void Bind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id); }
 };
 
-class VertexObject
-{
-	uint id{};
-	uint complexity{};
-	uint size{};
-	bool allocated = false;
-public:
-
-	void Create(uint complexity)
-	{
-		this->complexity = complexity;
-		glGenBuffers(1, &id);
-	}
-
-	void Create(float* data, uint size, uint complexity);
-
-	void Set(float* data, uint size)
-	{
-		this->size = size;
-		glBindBuffer(GL_ARRAY_BUFFER, id);
-		glBufferData(GL_ARRAY_BUFFER, size * complexity, data, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, id);
-		allocated = true;
-	}
-
-	void Update(float* data, uint offset, uint size)
-	{
-		if (!allocated)
-			return;
-		glBindBuffer(GL_ARRAY_BUFFER, id);
-		glBufferSubData(GL_ARRAY_BUFFER, offset * complexity, size * complexity, data);
-		glBindBuffer(GL_ARRAY_BUFFER, id);
-	}
-
-	void Bind() { glBindBuffer(GL_ARRAY_BUFFER, id); }
-
-
-};
 
 //Made it nicer to use.
 enum vertex_type

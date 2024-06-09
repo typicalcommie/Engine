@@ -1,21 +1,15 @@
 #version 460 core
 
-layout (location = 0) in vec3 pos;
-layout (location = 1) in vec2 tex;
-out vec2 inp;
+layout (location = 0) in vec3 posIn;
+layout (location = 1) in vec2 textureCoordsIn;
+out vec2 textureCoordsFrag;
 
-uniform float size;
-uniform vec4 offset;
 uniform mat4 transform;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main()
 {
-	inp = tex;
-	vec4 pos1 = vec4(pos, 1.0f);
-
-	pos1 = transform  * pos1;
-
-	
-
-	gl_Position = pos1;
+	textureCoordsFrag = textureCoordsIn;
+	gl_Position = projection * view * transform * vec4(posIn, 1.0f);
 }
