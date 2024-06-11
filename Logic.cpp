@@ -22,13 +22,22 @@ void Logic::Execute()
 	Camera::params* par = scenes.Get(user.currentScene)->GetCamera();
 	*par = user.camera;
 
+	
+
 } 
 
 void User::Move()
 {
+	vec3 data = input->GetData();
 
-	SetRotation(vec3(90.1f, 0.0f, 90.0f));
-	camera.position = vec3(0.0f, 0.0f, -5.0f);
+	camera.rotation -= vec3(data.x * mouseSens, data.y * -1.0f * mouseSens, data.x * mouseSens);
+
+	if (camera.rotation.y > 89) camera.rotation.y = 89;
+	else if (camera.rotation.y < -89) camera.rotation.y = -89;
+	
+	SetRotation(camera.rotation);
+
+	if (input->GetKey(GLFW_KEY_LEFT_SHIFT)) speed = 0.1f;
 
 	if (input->GetKey('W')) camera.position += rotationClamp * speed;
 		
@@ -37,17 +46,15 @@ void User::Move()
 	if (input->GetKey('D')) camera.position += cross(rotationClamp, vec3(0.0f, 1.0f, 0.0f)) * speed;
 	
 	if (input->GetKey('A')) camera.position -= cross(rotationClamp, vec3(0.0f, 1.0f, 0.0f)) * speed;
+
+	speed = 0.02f;
 }
 
 inline void User::SetRotation(vec3 rotation)
 {
-	camera.rotation = rotation;
+	if (rotation.y > 89) rotation.y = 89;
+	else if (rotation.y < -89) rotation.y = -89;
 
-	vec3 dat;
-
-	rotationClamp = radians(rotation);
-	dat.x = cos(rotationClamp.x);
-	dat.y = sin(rotationClamp.y);
-	dat.z = sin(rotationClamp.z);
+	rotationClamp = rotation_calc(this->camera.rotation = rotation);
 }
 

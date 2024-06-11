@@ -42,11 +42,11 @@ public:
 
 	mat4 GetView()
 	{
-		sincos.x = cos(radians(rotation.x));
+		sincos.x = cos(radians(rotation.x)) * cos(radians(rotation.y));	//HOLY SHIT. IT'S GENIUS. By taking cos of y axis, i restrict x and z axis, so i can look staight up!
+																		//When i look up, i looking at 90 degrees by y axis, which is 1.0 by sin, but by cos it's 0.0.
 		sincos.y = sin(radians(rotation.y));
-		sincos.z = sin(radians(rotation.z));
-		return lookAt(position, vec3(0.0f, 0.0f, 0.0f), up);
+		sincos.z = sin(radians(rotation.z)) * cos(radians(rotation.y));
 
-		//position + (sincos * vec3(1.0f, 1.0f, 1.0f))
+		return lookAt(position, position + (sincos * vec3(1.0f, 1.0f, 1.0f)), up);
 	}
 };

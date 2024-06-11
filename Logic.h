@@ -75,13 +75,13 @@ class User
 {
 public:
 	Input* input;
-	vec3 position{};
-	vec3 rotation{};
 	vec3 rotationClamp{};
+	float bruh = 0;
 
 	Camera::params camera;
 
-	float speed = 0.005f;
+	float speed = 0.01f;
+	float mouseSens = 0.2f;
 	uint currentScene = 0;
 
 	void Move();
