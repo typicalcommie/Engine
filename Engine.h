@@ -10,7 +10,7 @@
 class Engine
 {
 	GLFWwindow* window;
-
+	vec2 windowSize{};
 public:
 	Graphics graphics;
 	Logic logic;

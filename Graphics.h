@@ -15,28 +15,27 @@ class Model
 	uint vertexArrayObject{};
 
 	uint vertexBuffer{};
-	uint vertexCount, vertexComplexity;
+	uint vertexCount;
 
 	uint layoutId{};
 
 	static const uint offset = 4 * 4; //Magic, id, vertices count, complexity, indices count = 4 elements, 4 bytes each
 public:
 
-	void Create(uint id, float* vertices, uint complexity, uint count)
+	void Create(uint id, float* vertices, uint count)
 	{
 		this->id = id;
 		vertexCount = count;
-		vertexComplexity = complexity;
 
 		glGenVertexArrays(1, &vertexArrayObject);
 		glBindVertexArray(vertexArrayObject);
 		
 		glGenBuffers(1, &vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, count * complexity * 4, vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, (count * 5) * 4, vertices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, 20, (void*)0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, false, 20, (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, false, 20, (void*)0);	//id, count, type, normalized, size of stride, offset
+		glVertexAttribPointer(1, 2, GL_FLOAT, false, 20, (void*)12);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 

@@ -37,7 +37,7 @@ void User::Move()
 	
 	SetRotation(camera.rotation);
 
-	if (input->GetKey(GLFW_KEY_LEFT_SHIFT)) speed = 0.1f;
+	if (input->GetKey(GLFW_KEY_LEFT_SHIFT)) speed = 0.1f; 
 
 	if (input->GetKey('W')) camera.position += rotationClamp * speed;
 		

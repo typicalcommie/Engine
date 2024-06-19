@@ -24,9 +24,9 @@ public:
 
 	mat4 GetMatrix() { 
 		mat4 matrix(1);
-		matrix = rotate(matrix, radians(r), vec3(1.f, 0.0f, 0.0f));	//Rotate will broke the matrix if none of rotation directions will be defined
-		matrix = scale(matrix, scaleV);
 		matrix = translate(matrix, positionV); 
+		matrix = scale(matrix, scaleV);
+		matrix = rotate(matrix, radians(r), vec3(1.f, 0.0f, 0.0f));	//Rotate will broke the matrix if none of rotation directions will be defined
 		return matrix;
 	};
 };
